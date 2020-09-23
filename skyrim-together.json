@@ -1,0 +1,97 @@
+{
+    "game_slug": "skyrim-together",
+    "name": "Skyrim Together",
+    "year": 2019,
+    "runner": "wine",
+    "slug": "skyrim-together",
+    "version": "Skyrim Together / Harbor (latest version)",
+    "description": "Harbor launcher for Skyrim Together",
+    "script": {
+      "files": [
+        {
+          "harbor_downloader": {
+                "filename": "harbor.py",
+                "url": "https://raw.githubusercontent.com/santeri3700/skyrim-together-linux/master/download-latest-harbor.py"
+          }
+        }
+      ],
+      "game": {
+        "arch": "win64",
+        "exe": "drive_c/Program Files (x86)/Tilted Phoques/Harbor/Harbor.exe",
+        "prefix": "$GAMEDIR"
+      },
+      "installer": [
+        {
+          "task": {
+            "arch": "win64",
+            "description": "Creating Wine Prefix...",
+            "name": "create_prefix",
+            "prefix": "$GAMEDIR"
+          }
+        },
+        {
+            "chmodx": "harbor_downloader"
+        },
+        {
+            "execute": {
+                "file": "harbor_downloader",
+                "description": "Downloading the latest version of Harbor..."
+            }
+        },
+        {
+          "task": {
+            "description": "Installing Harbor...",
+            "executable": "$GAMEDIR/_harbor.exe",
+            "args": "/S",
+            "name": "wineexec",
+            "prefix": "$GAMEDIR"
+          }
+        },      
+        {
+            "task": {
+                "name": "set_regedit",
+                "path": "HKEY_CURRENT_USER\\Software\\Valve\\Steam",
+                "key": "SteamPath",
+                "value": "c:/program files (x86)/steam",
+                "type": "REG_SZ"
+            }
+        },
+        {
+            "task": {
+                "name": "set_regedit",
+                "path": "HKEY_CURRENT_USER\\Software\\Valve\\Steam",
+                "key": "SteamExe",
+                "value": "c:/program files (x86)/steam/steam.exe",
+                "type": "REG_SZ"
+            }
+        },
+        {
+            "task": {
+                "name": "set_regedit",
+                "path": "HKEY_CURRENT_USER\\Software\\Valve\\Steam\\ActiveProcess",
+                "key": "pid",
+                "value": "00000020",
+                "type": "REG_DWORD"
+            }
+        },
+        {
+          "task": {
+            "name": "winekill",
+            "prefix": "$GAMEDIR"
+          }
+        }
+      ],
+      "system": {
+        "env": {
+          "DXVK_HUD": "compiler",
+          "__GL_SHADER_DISK_CACHE": 1,
+          "__GL_SHADER_DISK_CACHE_PATH": "$GAMEDIR"
+        }
+      },
+      "wine": {
+        "dxvk": true,
+        "esync": true,
+        "sandbox": false
+      }
+    }
+  }
